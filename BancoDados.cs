@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -20,7 +21,7 @@ namespace ExemploCRUD
             try
             {
                 cn = new SqlConnection();
-                cn.ConnectionString = @"Data Source=.\sqlexpress;Initial Catalog=Papelaria; user id = ***; password = ******;";
+                cn.ConnectionString = @"Data Source=.\sqlexpress;Initial Catalog=nomedobanco; user id = usuario; password = senha;";
                 //comando open (abre o banco de dados) não pode ficar acima do connectionString
                 cn.Open();
                 comandos = new SqlCommand();
@@ -63,7 +64,7 @@ namespace ExemploCRUD
             try
             {
                 cn = new SqlConnection();
-                cn.ConnectionString = @"Data Source=.\sqlexpress;Initial Catalog=Papelaria; user id = ***; password = ******;";
+                cn.ConnectionString = @"Data Source=.\sqlexpress;Initial Catalog=nomedobanco; user id = usuario; password = senha;";
                 //comando open (abre o banco de dados) não pode ficar acima do connectionString
                 cn.Open();
                 comandos = new SqlCommand();
@@ -71,7 +72,7 @@ namespace ExemploCRUD
                 comandos.Connection = cn;
                 //qual o tipo de comando que iremos executar, neste exemplo será texto:
                 comandos.CommandType = CommandType.Text;
-                comandos.CommandText = "update categoria set titulo = @titulo where idcategoria=@vn)";
+                comandos.CommandText = "update categorias set titulo = @titulo where idcategoria=@vn";
                 //add parametro com valor:
                 comandos.Parameters.AddWithValue("@titulo", cat.Titulo);
                 comandos.Parameters.AddWithValue("@vn", cat.IdCategoria);
@@ -107,7 +108,7 @@ namespace ExemploCRUD
             try
             {
                 cn = new SqlConnection();
-                cn.ConnectionString = @"Data Source=.\sqlexpress;Initial Catalog=Papelaria; user id = ***; password = ******;";
+                cn.ConnectionString = @"Data Source=.\sqlexpress;Initial Catalog=nomedobanco; user id = usuario; password = senha;";
                 //comando open (abre o banco de dados) não pode ficar acima do connectionString
                 cn.Open();
                 comandos = new SqlCommand();
@@ -115,7 +116,7 @@ namespace ExemploCRUD
                 comandos.Connection = cn;
                 //qual o tipo de comando que iremos executar, neste exemplo será texto:
                 comandos.CommandType = CommandType.Text;
-                comandos.CommandText = "delete from categoria where idcategoria=@vn)";
+                comandos.CommandText = "delete from categorias where idcategoria=@vn)";
                 //add parametro com valor:
                 comandos.Parameters.AddWithValue("@vn", cat.IdCategoria);
 
@@ -143,7 +144,91 @@ namespace ExemploCRUD
             return rs;
         }
 
+        public List<Categoria> ListarCategorias(int id)
+        {
+            List<Categoria> lista = new List<Categoria>();
+            try
+            {
+                cn = new SqlConnection();
+                cn.ConnectionString = @"Data Source=.\sqlexpress;Initial Catalog=nomedobanco; user id = usuario; password = senha;";
+                cn.Open();
+                comandos = new SqlCommand();
+                comandos.Connection = cn;
+                comandos.CommandType = CommandType.Text;
+                comandos.CommandText = "select * from categorias where idcategoria=@vi";//int uso igual
+                comandos.Parameters.AddWithValue("@vi", id);
+                //ele retorna os dados consultados,executeReader é um leitor de dados, não retorna a tabela inteira
+                rd = comandos.ExecuteReader();
 
+                //loop para add dados na lista
+                while (rd.Read())
+                {
+                    lista.Add(new Categoria { IdCategoria = rd.GetInt32(0), Titulo = rd.GetString(1) });
+                    /*outro jeito de add
+                    Categoria ct = new Categoria(){
+                        IdCategoria = rd.GetInt32(0), Titulo = rd.GetString(1)*/
+                }
+                comandos.Parameters.Clear();
+            }
+            catch (SqlException se)
+            {
+                throw new Exception("Erro ao tentar listar. " + se.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro inesperado. " + ex.Message);
+            }
+            finally
+            {
+                cn.Close();
+            }
+            return lista;
+        }
+
+        public List<Categoria> ListarCategorias(string titulo)
+        {
+            List<Categoria> lista = new List<Categoria>();
+            try
+            {
+                cn = new SqlConnection();
+                cn.ConnectionString = @"Data Source=.\sqlexpress;Initial Catalog=nomedobanco; user id = usuario; password = senha;";
+                cn.Open();
+                comandos = new SqlCommand();
+                comandos.Connection = cn;
+                comandos.CommandType = CommandType.Text;
+                comandos.CommandText = "select * from categorias where titulo like @vi";//string uso like
+                comandos.Parameters.AddWithValue("@vi", titulo);
+                //ele retorna os dados consultados,executeReader é um leitor de dados, não retorna a tabela inteira
+                rd = comandos.ExecuteReader();
+
+                //loop para add dados na lista
+                while (rd.Read())
+                {
+                    lista.Add(new Categoria { IdCategoria = rd.GetInt32(0), Titulo = rd.GetString(1) });
+                    /*outro jeito de add
+                    Categoria ct = new Categoria(){
+                        IdCategoria = rd.GetInt32(0), Titulo = rd.GetString(1)*/
+                }
+                comandos.Parameters.Clear();
+            }
+            catch (SqlException se)
+            {
+                throw new Exception("Erro ao tentar listar. " + se.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro inesperado. " + ex.Message);
+            }
+            finally
+            {
+                cn.Close();
+            }
+            return lista;
+        }
+
+        
 
     }
 }
+
+
